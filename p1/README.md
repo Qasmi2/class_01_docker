@@ -68,7 +68,7 @@ docker run -d \
 
 ---
 
-## 🚀 4. Automated Deployment Script (Option 1: SSH Keys)
+## 🚀 4. Automated Deployment Script 
 
 To eliminate manual steps, use the deployment script included in this repository (`deploy.sh`). This script builds, pushes, logs into your remote server using pre-configured passwordless SSH keys, tears down stale containers, and starts the new instance automatically.
 
