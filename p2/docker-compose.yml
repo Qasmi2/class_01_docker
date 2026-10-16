@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: postgresql_db
+    restart: unless-stopped
+    networks:
+      - custom_net
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./init-db:/docker-entrypoint-initdb.d:ro   # Maps migration folder as Read-Only
+    ports:
+      - "5432:5432"
+
+networks:
+  custom_net:
+    external: true
+    name: my_custom_network
+  
+volumes:
+  pgdata:
+
