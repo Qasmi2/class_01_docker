@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: yourdockerhubusername/attendance-db:v1.0.0
+    container_name: postgresql_db
+    restart: unless-stopped
+    networks:
+      - custom_net
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./init-db:/docker-entrypoint-initdb.d:ro   # Maps migration folder as Read-Only
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    image: yourdockerhubusername/attendance-backend:v1.0.0
+    container_name: backend_api
+    restart: unless-stopped
+    networks:
+      - custom_net
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=postgresql_db
+      - DB_PORT=5432
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    image: yourdockerhubusername/attendance-frontend:v1.0.0
+    container_name: frontend_web
+    restart: unless-stopped
+    networks:
+      - custom_net
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+networks:
+  custom_net:
+    external: true      
+    name: my_custom_network
+  
+volumes:
+  pgdata:
