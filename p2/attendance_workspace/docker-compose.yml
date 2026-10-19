@@ -1,0 +1,66 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: postgresql_db
+    restart: unless-stopped
+    networks:
+      - custom_net
+    environment:
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./init-db:/docker-entrypoint-initdb.d:ro   # Maps migration folder as Read-Only
+    ports:
+      - "5432:5432"
+    # HEALTHCHECK LAYER: Verifies the database is ready to accept queries
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+  backend:
+    build: ./backend
+    container_name: backend_api
+    restart: unless-stopped
+    networks:
+      - custom_net
+    ports:
+      - "5000:5000"
+    environment:
+      - DB_HOST=postgresql_db
+      - DB_PORT=5432
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_NAME=${POSTGRES_DB}
+    depends_on:
+      postgres:
+          condition: service_healthy
+    
+  
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        - VITE_API_URL=http://localhost:5000
+    container_name: frontend_web
+    restart: unless-stopped
+    networks:
+      - custom_net
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+networks:
+  custom_net:
+    external: true
+    name: my_custom_network
+  
+volumes:
+  pgdata:
+
+

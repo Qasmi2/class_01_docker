@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+// Place this at the very top of App.jsx right under your imports
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 // ==========================================
 // 1. THE HEADER COMPONENT
@@ -77,7 +79,8 @@ export default function App() {
     const fetchAttendance = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch('http://localhost:5000/api/attendance');
+        const response = await fetch(`${API_BASE_URL}/api/attendance`);
+
         
         if (!response.ok) {
           throw new Error('Database server is not responding.');
@@ -103,8 +106,7 @@ export default function App() {
 
     try {
       setIsSubmitting(true);
-      
-      const response = await fetch('http://localhost:5000/api/attendance', {
+      const response = await fetch(`${API_BASE_URL}/api/attendance`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

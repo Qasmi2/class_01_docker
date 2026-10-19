@@ -7,3 +7,4 @@ router.get('/attendance', attendanceController.getAttendance);
 router.post('/attendance', attendanceController.addEmployee); // New endpoint for adding workers
 
 module.exports = router;
+
