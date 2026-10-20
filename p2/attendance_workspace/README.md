@@ -8,26 +8,31 @@ A fully containerized production-grade full-stack attendance management dashboar
 
 The system consists of three highly optimized, decoupled service layers connecting over a isolated bridge network:
 
-┌──────────────────────────────────────────────┐
-│               USER BROWSER                   │
-└──────────────────────┬───────────────────────┘
-│
-Public HTTP (Port 80 / 5000)
-│
-┌──────────────────────────────────────▼──────────────────────────────────────┐
-│ DOCKER BRIDGE NETWORK (my_custom_network)                                 │
-│                                                                             │
-│   ┌──────────────────┐          ┌──────────────────┐   Docker DNS           │
-│   │  frontend_web    │          │   backend_api    ├────────────────┐       │
-│   │  (Nginx Proxy)   │          │  (Node/Express)  │                │       │
-│   └──────────────────┘          └──────────────────┘                │       │
-│                                                                     │       │
-│                                                                     ▼       │
-│                                                            ┌────────────────┐
-│                                                            │ postgresql_db  │
-│                                                            │ (Postgres 18)  │
-│                                                            └────────────────┘
-└─────────────────────────────────────────────────────────────────────────────┘
+graph TD
+    classDef browser fill:#f9f9f9,stroke:#333,stroke-width:2px;
+    classDef network fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,stroke-dasharray: 5 5;
+    classDef container fill:#fff,stroke:#555,stroke-width:1.5px;
+    classDef db fill:#e8f5e9,stroke:#388e3c,stroke-width:2px;
+
+    User([User Browser]):::browser
+    
+    subgraph my_custom_network [DOCKER BRIDGE NETWORK: my_custom_network]
+        direction TB
+        subgraph Services
+            direction LR
+            Frontend["frontend_web<br/><i>(Nginx Proxy)</i>"]:::container
+            Backend["backend_api<br/><i>(Node/Express)</i>"]:::container
+        end
+        
+        DB["postgresql_db<br/><i>(Postgres 18)</i>"]:::db
+    end
+
+    User -- "Public HTTP (Port 80 / 5000)" --> Frontend
+    Frontend -- "Docker DNS" --> Backend
+    Backend -.-> DB
+
+    class my_custom_network network;
+
 
 
 *   **Frontend (`frontend_web`)**: A single-page React app bundled via Vite. Uses a **Multi-Stage Docker build** compiled using Node 22 and served via a highly performant **Nginx Alpine** engine (dropped from ~400MB down to **28.9MB**). Custom Nginx routing redirects fallback client endpoints cleanly to prevent 404 router reload issues.
