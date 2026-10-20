@@ -8,26 +8,6 @@ A fully containerized production-grade full-stack attendance management dashboar
 
 The system consists of three highly optimized, decoupled service layers connecting over a isolated bridge network:
 
-                ┌──────────────────────────────────────────────┐
-                │               USER BROWSER                   │
-                └──────────────────────┬───────────────────────┘
-                                       │
-                          Public HTTP (Port 80 / 5000)
-                                       │
-┌──────────────────────────────────────▼──────────────────────────────────────┐
-│ DOCKER BRIDGE NETWORK (my_custom_network)                                   │
-│                                                                             │
-│   ┌──────────────────┐          ┌──────────────────┐   Docker DNS           │
-│   │  frontend_web    │          │   backend_api    ├────────────────┐       │
-│   │  (Nginx Proxy)   │          │  (Node/Express)  │                │       │
-│   └──────────────────┘          └──────────────────┘                │       │
-│                                                                     │       │
-│                                                                     ▼       │
-│                                                            ┌────────────────┐
-│                                                            │ postgresql_db  │
-│                                                            │ (Postgres 18)  │
-│                                                            └────────────────┘
-└─────────────────────────────────────────────────────────────────────────────┘
 
 ![description](/home/bpg/Pictures/Screenshots/Screenshot from 2026-10-20 09-55-27.png)
 
