@@ -8,9 +8,28 @@ A fully containerized production-grade full-stack attendance management dashboar
 
 The system consists of three highly optimized, decoupled service layers connecting over a isolated bridge network:
 
+                ┌──────────────────────────────────────────────┐
+                │               USER BROWSER                   │
+                └──────────────────────┬───────────────────────┘
+                                       │
+                          Public HTTP (Port 80 / 5000)
+                                       │
+┌──────────────────────────────────────▼──────────────────────────────────────┐
+│ DOCKER BRIDGE NETWORK (my_custom_network)                                   │
+│                                                                             │
+│   ┌──────────────────┐          ┌──────────────────┐   Docker DNS           │
+│   │  frontend_web    │          │   backend_api    ├────────────────┐       │
+│   │  (Nginx Proxy)   │          │  (Node/Express)  │                │       │
+│   └──────────────────┘          └──────────────────┘                │       │
+│                                                                     │       │
+│                                                                     ▼       │
+│                                                            ┌────────────────┐
+│                                                            │ postgresql_db  │
+│                                                            │ (Postgres 18)  │
+│                                                            └────────────────┘
+└─────────────────────────────────────────────────────────────────────────────┘
 
-![description](/home/bpg/Pictures/Screenshots/Screenshot from 2026-10-20 09-55-27.png)
-
+![description]
 
 
 *   **Frontend (`frontend_web`)**: A single-page React app bundled via Vite. Uses a **Multi-Stage Docker build** compiled using Node 22 and served via a highly performant **Nginx Alpine** engine (dropped from ~400MB down to **28.9MB**). Custom Nginx routing redirects fallback client endpoints cleanly to prevent 404 router reload issues.

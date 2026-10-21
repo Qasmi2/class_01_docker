@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+  namespace: practice-app
+spec:
+  replicas: 2 # Scale up to 2 individual Pods for high availability!
+  selector:
+    matchLabels:
+      app: web-frontend
+  template:
+    metadata:
+      labels:
+        app: web-frontend
+    spec:
+      containers:
+      - name: web
+        image: nginx:alpine # Simulating our frontend app container
+        ports:
+        - containerPort: 80
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: db-config
+              key: DB_HOST
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  namespace: practice-app
+spec:
+  type: NodePort # Exposes the service outside the cluster via the Node's IP
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: 30008
+  selector:
+    app: web-frontend
