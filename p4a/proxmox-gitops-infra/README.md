@@ -46,7 +46,7 @@ Each VM has:
 - Terraform 1.6.0 or newer
 - An Ubuntu 24.04 Cloud-Init template named `ubuntu-2404-template`
 - Proxmox storage pools:
-  - `nvme-zfs` for VM disks
+  - `nvme-zfs` for VM disks    change the location according to you own storage 
   - `local-lvm` for Cloud-Init drives
 - Proxmox bridge `vmbr0`
 - SSH key pair on your workstation
